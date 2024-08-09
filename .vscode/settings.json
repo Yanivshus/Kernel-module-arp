@@ -1,8 +1,16 @@
 {
-    "C_Cpp.default.includePath": [
-        "/lib/modules/5.15.0-117-generic/build/include"
-    ],
+    "C_Cpp.errorSquiggles": "disabled",
     "files.associations": {
+        "kernel.h": "c",
+        "sysinfo.h": "c",
+        "const.h": "c",
+        "init.h": "c",
+        "fs.h": "c",
+        "module.h": "c",
+        "netfilter.h": "c",
+        "netfilter_ipv4.h": "c",
+        "ip.h": "c",
+        "hashtable.h": "c",
         "etherdevice.h": "c",
         "netdevice.h": "c"
     }
