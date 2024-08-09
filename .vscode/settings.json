@@ -1,0 +1,9 @@
+{
+    "C_Cpp.default.includePath": [
+        "/lib/modules/5.15.0-117-generic/build/include"
+    ],
+    "files.associations": {
+        "etherdevice.h": "c",
+        "netdevice.h": "c"
+    }
+}
