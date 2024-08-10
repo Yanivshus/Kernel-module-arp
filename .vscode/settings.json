@@ -12,6 +12,7 @@
         "ip.h": "c",
         "hashtable.h": "c",
         "etherdevice.h": "c",
-        "netdevice.h": "c"
+        "netdevice.h": "c",
+        "if_arp.h": "c"
     }
 }

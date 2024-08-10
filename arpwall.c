@@ -30,6 +30,7 @@ static void add_arp_entry(__be32 ip, unsigned char *mac)
         //check if already exists
         if(entry->ip == ip){
             //update.
+            printk(KERN_INFO "Updating to hash table: Mac %pM\n Ip %pI4", &mac, &entry->ip);
             memcpy(entry->mac, mac, ETH_ALEN);
             return;
         }
@@ -45,7 +46,7 @@ static void add_arp_entry(__be32 ip, unsigned char *mac)
     memcpy(entry->mac, mac, ETH_ALEN);
     //add to table
     hash_add(arp_table, &entry->node, ip);
-    //printk(KERN_INFO "Adding to hash table: %p\n", mac);
+    printk(KERN_INFO "Adding to hash table: %pM\n", &mac);
 }
 
 
@@ -53,7 +54,7 @@ static void add_arp_entry(__be32 ip, unsigned char *mac)
 /// @brief check if there is already mac in the table -> means there is arp poisoning.
 /// @param ip 
 /// @param mac 
-/// @return 
+/// @return SPOOFED_ALERT = there is spoofing, NOT_SPOOFED = there isn't spoofing.
 static int check_arp_spoofing(__be32 ip, unsigned char *mac)
 {
     struct arp_entry* entry;
@@ -64,7 +65,7 @@ static int check_arp_spoofing(__be32 ip, unsigned char *mac)
     {
         if(memcmp(entry->mac, mac, ETH_ALEN) == 0)
         {
-            //printk(KERN_ALERT "Detected spoofing from mac: %s\n", mac);
+            printk(KERN_ALERT "Detected spoofing from mac: %pM\n", &mac);
             return SPOOFED_ALERT;          
         }
     }
@@ -100,16 +101,18 @@ static unsigned int arp_hook_fnc(void *priv, struct sk_buff *skb, const struct n
         arp_ptr += arp->ar_hln + arp->ar_pln;
         unsigned char *dst_mac = arp_ptr; // dst mac
         __be32 dst_ip = *(__be32 *)(arp_ptr + arp->ar_hln); // dst ips
-        printk(KERN_INFO "Before checking Spoofing detetcted %s\n", src_mac); // need to remeber fix printing , computer crashes.
+
+        
+        printk(KERN_INFO "Arp packet detected: src= %pI4  %pM, dst= %pI4  %pM\n", &src_ip, &src_mac, &dst_ip, &dst_mac);
         if(ntohs(arp->ar_op) == ARPOP_REPLY)
         {
             if(check_arp_spoofing(src_ip, src_mac) == SPOOFED_ALERT)
             {
-                //printk(KERN_WARNING "Detected Spoofing: IP %pI4 MAC %pM\n", src_ip, src_mac);
+                printk(KERN_WARNING "Detected Spoofing: IP %pI4 MAC %pM\n", &src_ip, &src_mac);
                 return NF_DROP;
             }
             else{
-                printk(KERN_ALERT "Regular Arp packet: hw_type=%u, proto_type=%u, op=%u\n",htons(arp->ar_hrd), htons(arp->ar_pro), htons(arp->ar_op));
+                printk(KERN_ALERT "Regular Arp replay packet: IP %pI4 MAC %pM\n", &src_ip, &src_mac);
             }
             add_arp_entry(src_ip, src_mac);
         }
