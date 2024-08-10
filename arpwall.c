@@ -49,6 +49,11 @@ static void add_arp_entry(__be32 ip, unsigned char *mac)
 }
 
 
+
+/// @brief check if there is already mac in the table -> means there is arp poisoning.
+/// @param ip 
+/// @param mac 
+/// @return 
 static int check_arp_spoofing(__be32 ip, unsigned char *mac)
 {
     struct arp_entry* entry;
